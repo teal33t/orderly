@@ -14,11 +14,14 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+        api_docs:
+            pattern: ^/doc$
+            security: false
         main:
             stateless: true
             provider: users
             json_login:
-                check_path: auth
+                check_path: /auth
                 username_path: email
                 password_path: password
                 success_handler: lexik_jwt_authentication.handler.authentication_success
@@ -26,6 +29,12 @@ security:
             jwt: ~
 
     access_control:
+    # For dev purposes
+        - { path: ^/contexts, roles: PUBLIC_ACCESS }
+        - { path: ^/admin, roles: PUBLIC_ACCESS }
+        - { path: ^/docs.jsonld, roles: PUBLIC_ACCESS }
+    # For dev purposes
+
         - { path: ^/$, roles: PUBLIC_ACCESS }
         - { path: ^/docs, roles: PUBLIC_ACCESS }
         - { path: ^/auth, roles: PUBLIC_ACCESS }

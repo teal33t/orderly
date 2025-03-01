@@ -176,4 +176,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return in_array(self::ROLE_GUEST, $this->getRoles(), true);
     }
+
+    public function eraseCredentials(): void
+    {
+    }
 }

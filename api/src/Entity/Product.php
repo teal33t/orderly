@@ -45,6 +45,11 @@ class Product
     #[ORM\Column(type: 'integer')]
     #[Assert\NotBlank]
     #[Assert\GreaterThanOrEqual(0)]
+    private int $price = 0;
+
+    #[ORM\Column(type: 'integer')]
+    #[Assert\NotBlank]
+    #[Assert\GreaterThanOrEqual(0)]
     private int $count;
 
     #[ORM\Column(type: 'datetime')]
@@ -71,6 +76,17 @@ class Product
     public function getTitle(): string
     {
         return $this->title;
+    }
+
+    public function getPrice(): int
+    {
+        return $this->price;
+    }
+
+    public function setPrice(int $price): self
+    {
+        $this->price = $price;
+        return $this;
     }
 
     public function setTitle(string $title): self
