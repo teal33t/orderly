@@ -27,25 +27,27 @@ use Symfony\Component\Validator\Constraints as Assert;
 class OrderItem
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\Column(type: 'integer')]
     #[Groups(['order_item:read', 'order:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Order::class, inversedBy: 'items')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['order_item:read'])]
+    #[Assert\NotNull(message: 'An order item must belong to an order')]
     private ?Order $order = null;
 
     #[ORM\ManyToOne(targetEntity: Product::class)]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['order_item:read', 'order:read', 'order_item:write', 'order:write'])]
-    #[Assert\NotNull]
+    #[Assert\NotNull(message: 'An order item must have a product')]
     private ?Product $product = null;
 
     #[ORM\Column(type: 'integer')]
     #[Groups(['order_item:read', 'order:read', 'order_item:write', 'order:write'])]
-    #[Assert\NotBlank]
-    #[Assert\GreaterThan(0)]
+    #[Assert\NotBlank(message: 'Quantity cannot be blank')]
+    #[Assert\GreaterThan(value: 0, message: 'Quantity must be greater than 0')]
     private int $quantity = 1;
 
     #[ORM\Column(type: 'integer')]

@@ -10,6 +10,8 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -55,41 +57,49 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public const ROLE_GUEST = 'ROLE_GUEST';
 
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\Column(type: 'integer')]
     #[Groups(['user:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Assert\NotBlank]
-    #[Assert\Email]
+    #[Assert\NotBlank(message: 'Email cannot be blank')]
+    #[Assert\Email(message: 'The email {{ value }} is not a valid email.')]
     #[Groups(['user:read', 'user:write'])]
     private ?string $email = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'json')]
     #[Groups(['user:read'])]
     private array $roles = [self::ROLE_USER];
 
-    #[ORM\Column]
-    #[Assert\NotBlank(groups: ['user:write'])]
+    #[ORM\Column(type: 'string')]
+    #[Assert\NotBlank(groups: ['user:write'], message: 'Password cannot be blank')]
+    #[Assert\Length(min: 8, minMessage: 'Password must be at least {{ limit }} characters long')]
     #[Groups(['user:write'])]
     private ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['user:read', 'user:write'])]
+    #[Assert\Length(max: 255, maxMessage: 'First name cannot be longer than {{ limit }} characters')]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['user:read', 'user:write'])]
+    #[Assert\Length(max: 255, maxMessage: 'Last name cannot be longer than {{ limit }} characters')]
     private ?string $lastName = null;
 
     #[ORM\Column(type: 'datetime')]
     #[Groups(['user:read'])]
     private \DateTimeInterface $createdAt;
+    
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Order::class, cascade: ['remove'])]
+    #[Groups(['user:read'])]
+    private Collection $orders;
 
     public function __construct()
     {
         $this->createdAt = new \DateTime();
+        $this->orders = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -165,7 +175,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->createdAt;
     }
-
+    
+    public function getOrders(): Collection
+    {
+        return $this->orders;
+    }
+    
+    public function addOrder(Order $order): self
+    {
+        if (!$this->orders->contains($order)) {
+            $this->orders[] = $order;
+            $order->setUser($this);
+        }
+        return $this;
+    }
+    
+    public function removeOrder(Order $order): self
+    {
+        if ($this->orders->removeElement($order)) {
+            // set the owning side to null (unless already changed)
+            if ($order->getUser() === $this) {
+                $order->setUser(null);
+            }
+        }
+        return $this;
+    }
 
     public function isAdmin(): bool
     {
@@ -179,5 +213,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function eraseCredentials(): void
     {
+        // If you store any temporary, sensitive data on the user, clear it here
     }
 }

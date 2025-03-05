@@ -45,24 +45,27 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Order
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\Column(type: 'integer')]
     #[Groups(['order:read'])]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'orders')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['order:read'])]
+    #[Assert\NotNull(message: 'An order must belong to a user')]
     private User $user;
 
     #[ORM\OneToMany(mappedBy: 'order', targetEntity: OrderItem::class, cascade: ['persist', 'remove'])]
     #[Groups(['order:read', 'order:write'])]
     #[Assert\Valid]
+    #[Assert\Count(min: 1, minMessage: 'An order must have at least one item')]
     private Collection $items;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['order:read', 'order:write'])]
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(message: 'Status cannot be blank')]
+    #[Assert\Choice(choices: ['pending', 'processing', 'completed', 'cancelled'], message: 'Invalid order status')]
     private string $status = 'pending';
 
     #[ORM\Column(type: 'datetime')]
