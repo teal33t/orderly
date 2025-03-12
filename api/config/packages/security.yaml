@@ -29,16 +29,16 @@ security:
             jwt: ~
 
     access_control:
-    # For dev purposes
-        - { path: ^/contexts, roles: PUBLIC_ACCESS }
-        - { path: ^/admin, roles: PUBLIC_ACCESS }
-        - { path: ^/docs.jsonld, roles: PUBLIC_ACCESS }
-    # For dev purposes
-
+        # Public endpoints
         - { path: ^/$, roles: PUBLIC_ACCESS }
         - { path: ^/docs, roles: PUBLIC_ACCESS }
         - { path: ^/auth, roles: PUBLIC_ACCESS }
-        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
+        
+        # API endpoints handled by resource-level security
+        - { path: ^/categories, roles: PUBLIC_ACCESS }
+        
+        # Admin endpoints
+        - { path: ^/admin, roles: ROLE_ADMIN }
 
 when@test:
     security:
