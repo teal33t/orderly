@@ -35,8 +35,8 @@ security:
         - { path: ^/auth, roles: PUBLIC_ACCESS }
         
         # API endpoints handled by resource-level security
-        - { path: ^/categories, roles: PUBLIC_ACCESS }
-        
+        # - { path: ^/categories, roles: PUBLIC_ACCESS }
+        - { path: ^/contexts, roles: PUBLIC_ACCESS }
         # Admin endpoints
         - { path: ^/admin, roles: ROLE_ADMIN }
 

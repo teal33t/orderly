@@ -19,15 +19,15 @@ use Symfony\Component\Validator\Constraints as Assert;
         new GetCollection(),
         new Get(),
         new Post(
-            security: "is_granted('ROLE_ADMIN')",
+            security: "is_granted('ROLE_USER')",
             securityMessage: 'Only admins can create categories.'
         ),
         new Put(
-            security: "is_granted('ROLE_ADMIN')",
+            security: "is_granted('ROLE_USER')",
             securityMessage: 'Only admins can update categories.'
         ),
         new Delete(
-            security: "is_granted('ROLE_ADMIN')",
+            security: "is_granted('ROLE_USER')",
             securityMessage: 'Only admins can delete categories.'
         )
     ],

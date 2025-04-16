@@ -5,19 +5,36 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     operations: [
-        new GetCollection(
+        // new GetCollection(
+        //     security: "is_granted('ROLE_ADMIN')",
+        //     securityMessage: 'Only admins can view all order items.'
+        // ),
+        // new Get(
+        //     security: "is_granted('ROLE_ADMIN') or object.getOrder().getUser() == user",
+        //     securityMessage: 'You can only view your own order items.'
+        // ),
+        new GetCollection(),
+        new Get(),
+        new Post(
             security: "is_granted('ROLE_ADMIN')",
-            securityMessage: 'Only admins can view all order items.'
+            securityMessage: 'Only admins can create order items.'
         ),
-        new Get(
-            security: "is_granted('ROLE_ADMIN') or object.getOrder().getUser() == user",
-            securityMessage: 'You can only view your own order items.'
+        new Put(
+            security: "is_granted('ROLE_ADMIN')",
+            securityMessage: 'Only admins can update order items.'
+        ),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')",
+            securityMessage: 'Only admins can delete order items.'
         )
     ],
     normalizationContext: ['groups' => ['order_item:read']],
